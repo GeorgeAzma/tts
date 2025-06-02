@@ -12,7 +12,7 @@ OpenAI API compatible TTS model hosted on localhost:5000
 - download all model files from https://huggingface.co/ResembleAI/chatterbox/
 - place them in `chatterbox/` folder (conds.pt, s3gen.pt, t3_cfg.pt, tokenizer.json, ve.pt)
 - run `python server.py`
-- go to localhost:5000
+- go to `http://localhost:5000`
 
 ### Adding voices
 - place your voice in `voices/` folder
@@ -20,7 +20,7 @@ OpenAI API compatible TTS model hosted on localhost:5000
 - select your voice in the dropdown menu
 
 ### Using in Open WebUI
-- `admin panel > settings > audio`
+- `Admin Panel > Settings > Audio`
 - `TTS engine: OpenAI`
 - `API Base URL: http://localhost:5000/v1`
 - `API Key: unused (0)`

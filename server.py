@@ -167,6 +167,18 @@ async def remove_custom_voice():
         )
 
 
+@app.post("/v1/model/unload")
+async def unload_model():
+    global model
+    if model is not None:
+        del model
+        model = None
+        torch.cuda.empty_cache()
+        return {"message": "Model unloaded successfully."}
+    else:
+        return {"message": "Model is already unloaded."}
+
+
 from fastapi.staticfiles import StaticFiles
 
 app.mount("/", StaticFiles(directory="static", html=True), name="static")

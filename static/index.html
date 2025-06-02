@@ -58,6 +58,8 @@
             background: #1f2937;
             color: #f9fafb;
             overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #8b5cf6 transparent;
         }
 
         textarea:focus {
@@ -69,13 +71,11 @@
 
         textarea::-webkit-scrollbar {
             width: 8px;
-            height: 0;
             background: transparent;
         }
 
         textarea::-webkit-scrollbar-button {
             display: none;
-            height: 0;
         }
 
         textarea::-webkit-scrollbar-track {
@@ -92,11 +92,6 @@
 
         textarea::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(135deg, #7c3aed 0%, #0891b2 100%);
-        }
-
-        textarea {
-            scrollbar-width: thin;
-            scrollbar-color: #8b5cf6 transparent;
         }
 
         select {
@@ -539,9 +534,21 @@
                 </div>
             </div>
 
-            <select id="voice" disabled>
-                <option value="">Loading voices...</option>
-            </select>
+            <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
+                <select id="voice" disabled>
+                    <option value="">Loading voices...</option>
+                </select>
+                <button id="unloadButton" class="custom-voice-btn"
+                    style="padding: 14px 12px; height: auto; border-radius: 16px; background: #1f2937; border: 2px solid #374151; display: flex; align-items: center; justify-content: center;"
+                    onclick="unloadModel()">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        style="width: 24px; height: 24px;">
+                        <path d="M12 2l6 8H6l6-8z"></path>
+                        <rect x="6" y="14" width="12" height="8" rx="2"></rect>
+                    </svg>
+                </button>
+            </div>
 
             <input type="file" id="fileInput" class="hidden-file-input" accept="audio/*"
                 onchange="handleFileSelect(event)">
@@ -931,6 +938,23 @@
                 speak();
             }
         });
+
+        async function unloadModel() {
+            try {
+                const response = await fetch('/v1/model/unload', {
+                    method: 'POST'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to unload model');
+                }
+
+                showSuccess('Model unloaded successfully');
+            } catch (error) {
+                console.error('Unload error:', error);
+                showError('Failed to unload model');
+            }
+        }
     </script>
 </body>
 
