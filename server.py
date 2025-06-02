@@ -5,13 +5,14 @@ from chatterbox.tts import ChatterboxTTS
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime, timedelta, timezone
-import io
+from contextlib import asynccontextmanager
+from pathlib import Path
 import torch
 import asyncio
-from contextlib import asynccontextmanager
-import os
 import shutil
-from pathlib import Path
+import os
+import sys
+import io
 
 voice_cache = {}
 
@@ -65,30 +66,36 @@ class TTSRequest(BaseModel):
 
 @app.post("/v1/audio/speech")
 async def tts(req: TTSRequest):
-    global model, last_used
-    if model is None:
-        print("Loading model")
-        model = ChatterboxTTS.from_local("chatterbox", "cuda")
-    last_used = datetime.now(timezone.utc)
+    try:
+        global model, last_used
+        if model is None:
+            print("Loading model")
+            model = ChatterboxTTS.from_local("chatterbox", "cuda")
+        last_used = datetime.now(timezone.utc)
 
-    if req.voice not in voice_cache:
-        return {
-            "error": f"Voice '{req.voice}' not found. Available voices: {list(voice_cache.keys())}"
-        }
+        if req.voice not in voice_cache:
+            return {
+                "error": f"Voice '{req.voice}' not found. Available voices: {list(voice_cache.keys())}"
+            }
 
-    wav = model.generate(
-        text=req.input,
-        audio_prompt_path=voice_cache[req.voice],
-        exaggeration=req.exaggeration,
-        cfg_weight=req.cfg_weight,
-        temperature=req.temperature,
-    )
+        wav = model.generate(
+            text=req.input,
+            audio_prompt_path=voice_cache[req.voice],
+            exaggeration=req.exaggeration,
+            cfg_weight=req.cfg_weight,
+            temperature=req.temperature,
+        )
 
-    buffer = io.BytesIO()
-    ta.save(buffer, wav, model.sr, format="wav")
-    buffer.seek(0)
+        buffer = io.BytesIO()
+        ta.save(buffer, wav, model.sr, format="wav")
+        buffer.seek(0)
 
-    return StreamingResponse(buffer, media_type="audio/wav")
+        return StreamingResponse(buffer, media_type="audio/wav")
+    except RuntimeError as e:
+        if "CUDA" in str(e):
+            print(f"Fatal CUDA error: {e}. Restarting...")
+            os.execv(sys.executable, [sys.executable] + sys.argv)
+        raise
 
 
 @app.get("/v1/voices")
