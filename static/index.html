@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>TTS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(30, 30, 45, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 28px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #e5e7eb;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #374151;
+            border-radius: 16px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.3s ease;
+            background: #1f2937;
+            color: #f9fafb;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            background: #111827;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+        }
+
+        select {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #374151;
+            border-radius: 16px;
+            font-size: 16px;
+            font-family: inherit;
+            background: #1f2937;
+            color: #f9fafb;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            background: #111827;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+        }
+
+        select:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .slider-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .slider-container {
+            flex: 1;
+            position: relative;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #374151;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(139, 92, 246, 0.5);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+        }
+
+        .slider-value {
+            min-width: 60px;
+            text-align: center;
+            font-weight: 700;
+            color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.15);
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+        }
+
+        .speak-button {
+            width: 100%;
+            padding: 18px 24px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .speak-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(139, 92, 246, 0.5);
+        }
+
+        .speak-button:active {
+            transform: translateY(0);
+        }
+
+        .speak-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        audio {
+            width: 100%;
+            border-radius: 16px;
+            outline: none;
+        }
+
+        .error-message {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            padding: 16px 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            display: none;
+            font-weight: 500;
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .voice-loading {
+            color: #8b5cf6;
+            font-style: italic;
+            text-align: center;
+            padding: 10px;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 24px;
+                margin: 10px;
+            }
+
+            .slider-group {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+
+            .slider-value {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div id="errorMessage" class="error-message"></div>
+
+        <div class="form-group">
+            <label for="text">Text to Speech</label>
+            <textarea id="text" rows="4" placeholder="Enter your text here...">Hello world</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="voice">Voice</label>
+            <select id="voice" disabled>
+                <option value="">Loading voices...</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="exaggeration">Exaggeration</label>
+            <div class="slider-group">
+                <div class="slider-container">
+                    <input type="range" id="exaggeration" min="0" max="2" step="0.1" value="0.3">
+                </div>
+                <div class="slider-value" id="exaggerationValue">0.3</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="cfgWeight">CFG Weight</label>
+            <div class="slider-group">
+                <div class="slider-container">
+                    <input type="range" id="cfgWeight" min="0" max="2" step="0.1" value="0.8">
+                </div>
+                <div class="slider-value" id="cfgWeightValue">0.8</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="temperature">Temperature</label>
+            <div class="slider-group">
+                <div class="slider-container">
+                    <input type="range" id="temperature" min="0.1" max="2" step="0.1" value="0.3">
+                </div>
+                <div class="slider-value" id="temperatureValue">0.3</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <button id="speakButton" class="speak-button" onclick="speak()">
+                <span id="buttonText">Generate Speech</span>
+            </button>
+        </div>
+
+        <div class="form-group">
+            <audio id="audio" controls></audio>
+        </div>
+    </div>
+
+    <script>
+        // Load voices on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            loadVoices();
+        });
+
+        // Load available voices from the server
+        async function loadVoices() {
+            const voiceSelect = document.getElementById('voice');
+
+            try {
+                const response = await fetch('/v1/voices');
+
+                if (!response.ok) {
+                    throw new Error(`Failed to load voices: ${response.status}`);
+                }
+
+                const voices = await response.json();
+
+                // Clear loading option
+                voiceSelect.innerHTML = '';
+
+                if (voices.length === 0) {
+                    voiceSelect.innerHTML = '<option value="">No voices available</option>';
+                    return;
+                }
+
+                // Add voice options
+                voices.voices.forEach((voice, index) => {
+                    const option = document.createElement('option');
+                    option.value = voice;
+                    option.textContent = formatVoiceName(voice);
+
+                    // Select first voice by default
+                    if (index === 0) {
+                        option.selected = true;
+                    }
+
+                    voiceSelect.appendChild(option);
+                });
+
+                // Enable the dropdown
+                voiceSelect.disabled = false;
+
+            } catch (error) {
+                console.error('Error loading voices:', error);
+                voiceSelect.innerHTML = '<option value="">Error loading voices, ' + error.message + '</option>';
+                showError('Failed to load available voices. Please refresh the page.');
+            }
+        }
+
+        // Format voice name for display (capitalize first letter, replace underscores)
+        function formatVoiceName(voiceName) {
+            return voiceName
+                .replace(/_/g, ' ')
+                .replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        // Update slider value displays
+        function updateSliderValue(sliderId, displayId, decimals = 1) {
+            const slider = document.getElementById(sliderId);
+            const display = document.getElementById(displayId);
+            display.textContent = parseFloat(slider.value).toFixed(decimals);
+        }
+
+        // Add event listeners for real-time slider updates
+        document.getElementById('exaggeration').addEventListener('input', function () {
+            updateSliderValue('exaggeration', 'exaggerationValue', 1);
+        });
+
+        document.getElementById('cfgWeight').addEventListener('input', function () {
+            updateSliderValue('cfgWeight', 'cfgWeightValue', 1);
+        });
+
+        document.getElementById('temperature').addEventListener('input', function () {
+            updateSliderValue('temperature', 'temperatureValue', 1);
+        });
+
+        // Show error message
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = message;
+            errorElement.classList.add('show');
+
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                errorElement.classList.remove('show');
+            }, 5000);
+        }
+
+        // Hide error message
+        function hideError() {
+            document.getElementById('errorMessage').classList.remove('show');
+        }
+
+        async function speak() {
+            const button = document.getElementById('speakButton');
+            const buttonText = document.getElementById('buttonText');
+
+            // Hide any previous errors
+            hideError();
+
+            // Get form values
+            const input = document.getElementById('text').value.trim();
+            if (!input) {
+                showError('Please enter some text to generate speech.');
+                return;
+            }
+
+            const voice = document.getElementById('voice').value;
+            if (!voice) {
+                showError('Please select a voice.');
+                return;
+            }
+
+            const exaggeration = parseFloat(document.getElementById('exaggeration').value);
+            const cfg_weight = parseFloat(document.getElementById('cfgWeight').value);
+            const temperature = parseFloat(document.getElementById('temperature').value);
+
+            // Show loading state
+            button.disabled = true;
+            buttonText.innerHTML = '<span class="loading"></span>Generating...';
+
+            try {
+                const res = await fetch('/v1/audio/speech', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        input: input,
+                        voice: voice,
+                        exaggeration: exaggeration,
+                        cfg_weight: cfg_weight,
+                        temperature: temperature
+                    })
+                });
+
+                if (!res.ok) {
+                    const errorData = await res.text();
+                    throw new Error(`Server error (${res.status}): ${errorData || 'Unknown error occurred'}`);
+                }
+
+                const blob = await res.blob();
+                if (blob.size === 0) {
+                    throw new Error('Received empty audio file from server');
+                }
+
+                const url = URL.createObjectURL(blob);
+                const audio = document.getElementById('audio');
+                audio.src = url;
+
+                // Auto-play the audio
+                try {
+                    await audio.play();
+                } catch (playError) {
+                    console.warn('Auto-play failed:', playError);
+                    // This is normal behavior in many browsers due to auto-play policies
+                }
+
+            } catch (error) {
+                console.error('TTS Error:', error);
+                showError(`Failed to generate speech: ${error.message}`);
+            } finally {
+                // Reset button state
+                button.disabled = false;
+                buttonText.textContent = 'Generate Speech';
+            }
+        }
+
+        // Allow Enter key to trigger speech generation
+        document.getElementById('text').addEventListener('keydown', function (event) {
+            if (event.ctrlKey && event.key === 'Enter') {
+                speak();
+            }
+        });
+    </script>
+</body>
+
+</html>
