@@ -53,10 +53,11 @@
             border-radius: 16px;
             font-size: 16px;
             font-family: inherit;
-            resize: vertical;
+            resize: none;
             transition: all 0.3s ease;
             background: #1f2937;
             color: #f9fafb;
+            overflow-y: auto;
         }
 
         textarea:focus {
@@ -66,9 +67,41 @@
             box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
         }
 
+        textarea::-webkit-scrollbar {
+            width: 8px;
+            height: 0;
+            background: transparent;
+        }
+
+        textarea::-webkit-scrollbar-button {
+            display: none;
+            height: 0;
+        }
+
+        textarea::-webkit-scrollbar-track {
+            background: rgba(55, 65, 81, 0.5);
+            border-radius: 4px;
+        }
+
+        textarea::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #7c3aed 0%, #0891b2 100%);
+        }
+
+        textarea {
+            scrollbar-width: thin;
+            scrollbar-color: #8b5cf6 transparent;
+        }
+
         select {
             width: 100%;
-            padding: 16px 20px;
+            padding: 16px;
             border: 2px solid #374151;
             border-radius: 16px;
             font-size: 16px;
@@ -77,6 +110,14 @@
             color: #f9fafb;
             cursor: pointer;
             transition: all 0.3s ease;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%238b5cf6' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 12px center;
+            background-repeat: no-repeat;
+            background-size: 22px;
+            padding-right: 40px;
         }
 
         select:focus {
@@ -205,6 +246,188 @@
             display: block;
         }
 
+        .success-message {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 16px 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            display: none;
+            font-weight: 500;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        /* Voice Upload Styles */
+        .voice-upload-container {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .voice-upload-area {
+            border: 3px dashed #374151;
+            border-radius: 16px;
+            padding: 16px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(31, 41, 55, 0.5);
+            position: relative;
+            overflow: hidden;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .voice-upload-area:hover {
+            border-color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .voice-upload-area.drag-over {
+            border-color: #06b6d4;
+            background: rgba(6, 182, 212, 0.15);
+            transform: scale(1.02);
+        }
+
+        .voice-upload-area.has-custom-voice {
+            border: 3px solid #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .voice-upload-area.has-custom-voice:hover {
+            border-color: #059669;
+            background: rgba(16, 185, 129, 0.15);
+        }
+
+        .voice-upload-content {
+            pointer-events: none;
+            width: 100%;
+        }
+
+        /* Default upload state */
+        .upload-icon {
+            font-size: 24px;
+            color: #8b5cf6;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .upload-text {
+            color: #e5e7eb;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .upload-subtext {
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        /* Custom voice loaded state */
+        .custom-voice-content {
+            display: none;
+            width: 100%;
+        }
+
+        .voice-upload-area.has-custom-voice .custom-voice-content {
+            display: block;
+        }
+
+        .voice-upload-area.has-custom-voice .default-upload-content {
+            display: none;
+        }
+
+        .custom-voice-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .custom-voice-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .custom-voice-icon {
+            font-size: 20px;
+            color: #10b981;
+        }
+
+        .custom-voice-details {
+            text-align: left;
+        }
+
+        .custom-voice-name {
+            color: #10b981;
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 2px;
+        }
+
+        .custom-voice-status {
+            color: #6ee7b7;
+            font-size: 12px;
+        }
+
+        .custom-voice-buttons {
+            display: flex;
+            gap: 8px;
+            pointer-events: all;
+        }
+
+        .custom-voice-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .preview-btn {
+            background: rgba(6, 182, 212, 0.2);
+            color: #06b6d4aa;
+            border: 2px solid #06b6d4aa;
+        }
+
+        .preview-btn:hover {
+            background: rgba(6, 182, 212, 0.3);
+        }
+
+        .remove-btn {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444aa;
+            border: 2px solid #ef4444aa;
+        }
+
+        .remove-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        .reupload-text {
+            color: #6ee7b7;
+            font-size: 12px;
+            font-style: italic;
+            text-align: center;
+            margin-top: 8px;
+            pointer-events: none;
+        }
+
+        .hidden-file-input {
+            display: none;
+        }
+
         @keyframes slideIn {
             from {
                 opacity: 0;
@@ -256,6 +479,18 @@
             .slider-value {
                 text-align: left;
             }
+
+            .upload-icon {
+                font-size: 36px;
+            }
+
+            .upload-text {
+                font-size: 14px;
+            }
+
+            .upload-subtext {
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -263,6 +498,7 @@
 <body>
     <div class="container">
         <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="success-message"></div>
 
         <div class="form-group">
             <label for="text">Text to Speech</label>
@@ -271,9 +507,44 @@
 
         <div class="form-group">
             <label for="voice">Voice</label>
+
+            <!-- Voice Upload Area -->
+            <div class="voice-upload-container">
+                <div class="voice-upload-area" id="voiceUploadArea" onclick="triggerFileSelect()">
+                    <div class="voice-upload-content">
+                        <!-- Default upload state -->
+                        <div class="default-upload-content">
+                            <span class="upload-icon">🎤</span>
+                            <div class="upload-text">Upload Custom Voice</div>
+                            <div class="upload-subtext">Drag & drop an audio file or click to browse</div>
+                        </div>
+
+                        <!-- Custom voice loaded state -->
+                        <div class="custom-voice-content">
+                            <div class="custom-voice-header">
+                                <div class="custom-voice-info">
+                                    <div class="custom-voice-details">
+                                        <div class="custom-voice-name" id="customVoiceName">Custom Voice Loaded</div>
+                                    </div>
+                                </div>
+                                <div class="custom-voice-buttons">
+                                    <button class="custom-voice-btn preview-btn"
+                                        onclick="previewCustomVoice(event)">Preview</button>
+                                    <button class="custom-voice-btn remove-btn"
+                                        onclick="removeCustomVoice(event)">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <select id="voice" disabled>
                 <option value="">Loading voices...</option>
             </select>
+
+            <input type="file" id="fileInput" class="hidden-file-input" accept="audio/*"
+                onchange="handleFileSelect(event)">
         </div>
 
         <div class="form-group">
@@ -318,10 +589,162 @@
     </div>
 
     <script>
+        let customVoiceLoaded = false;
+
         // Load voices on page load
         document.addEventListener('DOMContentLoaded', function () {
             loadVoices();
+            setupDragAndDrop();
         });
+
+        // Setup drag and drop functionality
+        function setupDragAndDrop() {
+            const uploadArea = document.getElementById('voiceUploadArea');
+
+            uploadArea.addEventListener('dragover', function (e) {
+                e.preventDefault();
+                uploadArea.classList.add('drag-over');
+            });
+
+            uploadArea.addEventListener('dragleave', function (e) {
+                e.preventDefault();
+                uploadArea.classList.remove('drag-over');
+            });
+
+            uploadArea.addEventListener('drop', function (e) {
+                e.preventDefault();
+                uploadArea.classList.remove('drag-over');
+
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFileUpload(files[0]);
+                }
+            });
+        }
+
+        // Trigger file selector
+        function triggerFileSelect() {
+            document.getElementById('fileInput').click();
+        }
+
+        // Handle file selection from input
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                handleFileUpload(file);
+            }
+        }
+
+        // Handle file upload
+        async function handleFileUpload(file) {
+            // Validate file type
+            if (!file.type.startsWith('audio/')) {
+                showError('Please select an audio file (MP3, WAV, etc.)');
+                return;
+            }
+
+            // Validate file size (max 50MB)
+            const maxSize = 50 * 1024 * 1024;
+            if (file.size > maxSize) {
+                showError('File size must be less than 50MB');
+                return;
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('voice', file);
+
+                const response = await fetch('/v1/voices/custom', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Upload failed: ${errorText}`);
+                }
+
+                const result = await response.json();
+
+                // Update the upload area to show custom voice loaded state
+                customVoiceLoaded = true;
+                const uploadArea = document.getElementById('voiceUploadArea');
+                uploadArea.classList.add('has-custom-voice');
+                document.getElementById('customVoiceName').textContent = file.name;
+
+                // Reload voices to include the custom voice
+                await loadVoices();
+
+                // Select the custom voice
+                const voiceSelect = document.getElementById('voice');
+                voiceSelect.value = 'custom';
+
+                showSuccess('Custom voice uploaded successfully!');
+
+            } catch (error) {
+                console.error('Upload error:', error);
+                showError(`Failed to upload voice: ${error.message}`);
+            }
+
+            // Clear file input
+            document.getElementById('fileInput').value = '';
+        }
+
+        // Preview custom voice
+        async function previewCustomVoice(event) {
+            event.stopPropagation();
+
+            if (!customVoiceLoaded) {
+                showError('No custom voice loaded');
+                return;
+            }
+
+            try {
+                const response = await fetch('/v1/voices/custom/preview');
+                if (!response.ok) {
+                    throw new Error('Failed to load preview');
+                }
+
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const audio = document.getElementById('audio');
+                audio.src = url;
+                audio.play();
+
+            } catch (error) {
+                console.error('Preview error:', error);
+                showError('Failed to preview custom voice');
+            }
+        }
+
+        // Remove custom voice
+        async function removeCustomVoice(event) {
+            event.stopPropagation();
+
+            try {
+                const response = await fetch('/v1/voices/custom', {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to remove custom voice');
+                }
+
+                // Update the upload area to show default state
+                customVoiceLoaded = false;
+                const uploadArea = document.getElementById('voiceUploadArea');
+                uploadArea.classList.remove('has-custom-voice');
+
+                // Reload voices
+                await loadVoices();
+
+                showSuccess('Custom voice removed successfully');
+
+            } catch (error) {
+                console.error('Remove error:', error);
+                showError('Failed to remove custom voice');
+            }
+        }
 
         // Load available voices from the server
         async function loadVoices() {
@@ -350,8 +773,10 @@
                     option.value = voice;
                     option.textContent = formatVoiceName(voice);
 
-                    // Select first voice by default
-                    if (index === 0) {
+                    // Select first voice by default (unless custom is available)
+                    if (index === 0 && !customVoiceLoaded) {
+                        option.selected = true;
+                    } else if (voice === 'custom' && customVoiceLoaded) {
                         option.selected = true;
                     }
 
@@ -370,6 +795,9 @@
 
         // Format voice name for display (capitalize first letter, replace underscores)
         function formatVoiceName(voiceName) {
+            if (voiceName === 'custom') {
+                return 'Custom';
+            }
             return voiceName
                 .replace(/_/g, ' ')
                 .replace(/\b\w/g, l => l.toUpperCase());
@@ -405,6 +833,18 @@
             setTimeout(() => {
                 errorElement.classList.remove('show');
             }, 5000);
+        }
+
+        // Show success message
+        function showSuccess(message) {
+            const successElement = document.getElementById('successMessage');
+            successElement.textContent = message;
+            successElement.classList.add('show');
+
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                successElement.classList.remove('show');
+            }, 3000);
         }
 
         // Hide error message

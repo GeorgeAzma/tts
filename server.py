@@ -1,6 +1,6 @@
 import torchaudio as ta
-from fastapi import FastAPI
-from fastapi.responses import StreamingResponse
+from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi.responses import StreamingResponse, FileResponse
 from chatterbox.tts import ChatterboxTTS
 from pydantic import BaseModel
 from typing import Optional
@@ -10,6 +10,7 @@ import torch
 import asyncio
 from contextlib import asynccontextmanager
 import os
+import shutil
 from pathlib import Path
 
 voice_cache = {}
@@ -96,6 +97,74 @@ async def list_voices():
     if not voice_cache:
         load_voice_cache()
     return {"voices": list(voice_cache.keys())}
+
+
+@app.post("/v1/voices/custom")
+async def upload_custom_voice(voice: UploadFile = File(...)):
+    """Upload a custom voice file"""
+
+    # Validate file type
+    if not voice.content_type.startswith("audio/"):
+        raise HTTPException(status_code=400, detail="File must be an audio file")
+
+    # Ensure voices directory exists
+    voices_dir = Path("voices")
+    voices_dir.mkdir(exist_ok=True)
+
+    # Save as custom.wav
+    custom_voice_path = voices_dir / "custom.wav"
+
+    try:
+        with open(custom_voice_path, "wb") as buffer:
+            shutil.copyfileobj(voice.file, buffer)
+
+        # Reload voice cache to include the new custom voice
+        load_voice_cache()
+
+        return {
+            "message": "Custom voice uploaded successfully",
+            "filename": voice.filename,
+        }
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to save custom voice: {str(e)}"
+        )
+
+
+@app.get("/v1/voices/custom/preview")
+async def preview_custom_voice():
+    """Return the custom voice file for preview"""
+    custom_voice_path = Path("voices") / "custom.wav"
+
+    if not custom_voice_path.exists():
+        raise HTTPException(status_code=404, detail="No custom voice found")
+
+    return FileResponse(
+        path=str(custom_voice_path), media_type="audio/wav", filename="custom.wav"
+    )
+
+
+@app.delete("/v1/voices/custom")
+async def remove_custom_voice():
+    """Remove the custom voice file"""
+    custom_voice_path = Path("voices") / "custom.wav"
+
+    if not custom_voice_path.exists():
+        raise HTTPException(status_code=404, detail="No custom voice found")
+
+    try:
+        custom_voice_path.unlink()  # Delete the file
+
+        # Reload voice cache to remove the custom voice
+        load_voice_cache()
+
+        return {"message": "Custom voice removed successfully"}
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to remove custom voice: {str(e)}"
+        )
 
 
 from fastapi.staticfiles import StaticFiles
