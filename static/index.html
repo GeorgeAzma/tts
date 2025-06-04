@@ -452,6 +452,33 @@
             }
         }
 
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        #recordButton.recording svg {
+            stroke: #ef4444;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        #recordButton.recording {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
         .voice-loading {
             color: #8b5cf6;
             font-style: italic;
@@ -533,11 +560,21 @@
                     </div>
                 </div>
             </div>
-
             <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
                 <select id="voice" disabled>
                     <option value="">Loading voices...</option>
                 </select>
+                <button id="recordButton" class="custom-voice-btn" title="Record Custom Voice"
+                    style="padding: 14px 12px; height: auto; border-radius: 16px; background: #1f2937; border: 2px solid #374151; display: flex; align-items: center; justify-content: center;"
+                    onclick="toggleRecording()">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        style="width: 24px; height: 24px;">
+                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                        <line x1="12" y1="19" x2="12" y2="22"></line>
+                    </svg>
+                </button>
                 <button id="unloadButton" class="custom-voice-btn"
                     style="padding: 14px 12px; height: auto; border-radius: 16px; background: #1f2937; border: 2px solid #374151; display: flex; align-items: center; justify-content: center;"
                     onclick="unloadModel()">
@@ -594,9 +631,49 @@
             <audio id="audio" controls></audio>
         </div>
     </div>
-
     <script>
         let customVoiceLoaded = false;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let isRecording = false;
+
+        // Microphone recording functions
+        async function toggleRecording() {
+            const recordButton = document.getElementById('recordButton');
+
+            if (!isRecording) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+
+                    mediaRecorder.ondataavailable = (event) => {
+                        audioChunks.push(event.data);
+                    };
+
+                    mediaRecorder.onstop = async () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        const file = new File([audioBlob], 'recorded-voice.wav', { type: 'audio/wav' });
+                        await handleFileUpload(file);
+
+                        // Stop all tracks to release microphone
+                        stream.getTracks().forEach(track => track.stop());
+                    };
+
+                    mediaRecorder.start();
+                    isRecording = true;
+                    recordButton.classList.add('recording');
+                    showSuccess('Recording started... Click again to stop.');
+                } catch (error) {
+                    console.error('Recording error:', error);
+                    showError('Failed to access microphone. Please ensure microphone permissions are granted.');
+                }
+            } else {
+                mediaRecorder.stop();
+                isRecording = false;
+                recordButton.classList.remove('recording');
+            }
+        }
 
         // Load voices on page load
         document.addEventListener('DOMContentLoaded', function () {
