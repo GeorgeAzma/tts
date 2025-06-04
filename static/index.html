@@ -717,7 +717,6 @@
                     mediaRecorder.start();
                     isRecording = true;
                     recordButton.classList.add('recording');
-                    showSuccess('Recording started... Click again to stop.');
                 } catch (error) {
                     console.error('Recording error:', error);
                     showError('Failed to access microphone. Please ensure microphone permissions are granted.');
