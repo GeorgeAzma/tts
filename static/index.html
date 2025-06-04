@@ -33,7 +33,7 @@
         }
 
         .form-group {
-            margin-bottom: 28px;
+            margin-bottom: 24px;
         }
 
         label {
@@ -514,6 +514,19 @@
                 font-size: 12px;
             }
         }
+
+        audio::-webkit-media-controls-panel {
+            background-color: #8980552f;
+        }
+
+        audio::-webkit-media-controls-enclosure {
+            border-radius: 0px;
+            background-color: transparent;
+        }
+
+        audio {
+            filter: invert(1);
+        }
     </style>
 </head>
 
@@ -523,13 +536,10 @@
         <div id="successMessage" class="success-message"></div>
 
         <div class="form-group">
-            <label for="text">Text to Speech</label>
             <textarea id="text" rows="4" placeholder="Enter your text here...">Hello world</textarea>
         </div>
 
         <div class="form-group">
-            <label for="voice">Voice</label>
-
             <!-- Voice Upload Area -->
             <div class="voice-upload-container">
                 <div class="voice-upload-area" id="voiceUploadArea" onclick="triggerFileSelect()">
@@ -537,7 +547,7 @@
                         <!-- Default upload state -->
                         <div class="default-upload-content">
                             <span class="upload-icon">🎤</span>
-                            <div class="upload-text">Upload Custom Voice</div>
+                            <div class="upload-text">Upload Voice</div>
                             <div class="upload-subtext">Drag & drop an audio file or click to browse</div>
                         </div>
 
@@ -560,6 +570,12 @@
                     </div>
                 </div>
             </div>
+
+            <div class="form-group">
+                <input type="file" id="fileInput" class="hidden-file-input" accept="audio/*"
+                    onchange="handleFileSelect(event)">
+            </div>
+
             <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
                 <select id="voice" disabled>
                     <option value="">Loading voices...</option>
@@ -587,8 +603,6 @@
                 </button>
             </div>
 
-            <input type="file" id="fileInput" class="hidden-file-input" accept="audio/*"
-                onchange="handleFileSelect(event)">
         </div>
 
         <div class="form-group">
@@ -626,10 +640,7 @@
                 <span id="buttonText">Generate Speech</span>
             </button>
         </div>
-
-        <div class="form-group">
-            <audio id="audio" controls></audio>
-        </div>
+        <audio id="audio" controls></audio>
     </div>
     <script>
         let customVoiceLoaded = false;
