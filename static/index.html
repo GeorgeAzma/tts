@@ -453,38 +453,54 @@
             }
         }
 
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-                opacity: 1;
-            }
-
-            50% {
-                transform: scale(1.1);
-                opacity: 0.8;
-            }
-
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
+        /* Add styles for unload button icons */
+        .icon-transition {
+            position: absolute;
+            transition: all 0.3s ease;
         }
 
-        #recordButton.recording svg {
-            stroke: #ef4444;
-            animation: pulse 1.5s ease-in-out infinite;
+        #unloadIcon {
+            opacity: 1;
+            transform: scale(1);
         }
 
-        #recordButton.recording {
-            border-color: #ef4444;
-            background: rgba(239, 68, 68, 0.1);
+        #unloadIcon.hide {
+            opacity: 0;
+            transform: scale(0.8);
         }
 
-        .voice-loading {
-            color: #8b5cf6;
-            font-style: italic;
-            text-align: center;
-            padding: 10px;
+        #unloadedIcon {
+            opacity: 0;
+            transform: scale(0.8) rotate(-90deg);
+        }
+
+        #unloadedIcon.show {
+            opacity: 1;
+            transform: scale(1) rotate(0);
+        }
+
+        .unload-success {
+            border-color: #10b981 !important;
+            background: rgba(16, 185, 129, 0.1) !important;
+        }
+
+        .unload-success svg {
+            stroke: #10b981 !important;
+        }
+
+        .unload-loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            border-radius: 50%;
+            border-top-color: #8b5cf6;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        #unloadButton.unloading {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
 
         @media (max-width: 640px) {
@@ -576,30 +592,31 @@
                 <input type="file" id="fileInput" class="hidden-file-input" accept="audio/*"
                     onchange="handleFileSelect(event)">
             </div>
-
-            <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
-                <select id="voice" disabled>
+            <div class="form-group" style="display: flex; align-items: stretch; gap: 8px;">
+                <select id="voice" disabled style="height: 52px; padding: 0 40px 0 16px;">
                     <option value="">Loading voices...</option>
                 </select>
                 <button id="recordButton" class="custom-voice-btn" title="Record Custom Voice"
-                    style="padding: 14px 12px; height: auto; border-radius: 16px; background: #1f2937; border: 2px solid #374151; display: flex; align-items: center; justify-content: center;"
-                    onclick="toggleRecording()">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6"
-                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    style="width: 52px; height: 52px; padding: 0; border-radius: 16px; background: #1f2937; border: 2px solid #374151; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"
+                    onclick="toggleRecording()"> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                         style="width: 24px; height: 24px;">
                         <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
                         <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
                         <line x1="12" y1="19" x2="12" y2="22"></line>
-                    </svg>
-                </button>
-                <button id="unloadButton" class="custom-voice-btn"
-                    style="padding: 14px 12px; height: auto; border-radius: 16px; background: #1f2937; border: 2px solid #374151; display: flex; align-items: center; justify-content: center;"
+                    </svg> </button> <button id="unloadButton" class="custom-voice-btn"
+                    style="width: 52px; height: 52px; padding: 0; border-radius: 16px; background: #1f2937; border: 2px solid #374151; display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0;"
                     onclick="unloadModel()">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6"
-                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    <svg id="unloadIcon" class="icon-transition" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                        fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                         style="width: 24px; height: 24px;">
                         <path d="M12 2l6 8H6l6-8z"></path>
                         <rect x="6" y="14" width="12" height="8" rx="2"></rect>
+                    </svg>
+                    <svg id="unloadedIcon" class="icon-transition" xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" style="width: 24px; height: 24px;">
+                        <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                 </button>
             </div>
@@ -1023,10 +1040,17 @@
             if (event.ctrlKey && event.key === 'Enter') {
                 speak();
             }
-        });
+        }); async function unloadModel() {
+            const unloadButton = document.getElementById('unloadButton');
+            const unloadIcon = document.getElementById('unloadIcon');
+            const unloadedIcon = document.getElementById('unloadedIcon');
 
-        async function unloadModel() {
             try {
+                // Start transition
+                unloadIcon.classList.add('hide');
+                unloadedIcon.classList.add('show');
+                unloadButton.classList.add('unload-success');
+
                 const response = await fetch('/v1/model/unload', {
                     method: 'POST'
                 });
@@ -1035,10 +1059,21 @@
                     throw new Error('Failed to unload model');
                 }
 
-                showSuccess('Model unloaded successfully');
+                // Keep success state for 1.5 seconds
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                // Reset with animation
+                unloadIcon.classList.remove('hide');
+                unloadedIcon.classList.remove('show');
+                unloadButton.classList.remove('unload-success');
             } catch (error) {
                 console.error('Unload error:', error);
                 showError('Failed to unload model');
+
+                // Reset state in case of error
+                unloadIcon.classList.remove('hide');
+                unloadedIcon.classList.remove('show');
+                unloadButton.classList.remove('unload-success');
             }
         }
     </script>
