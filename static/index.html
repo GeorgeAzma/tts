@@ -774,9 +774,6 @@
                 // Select the custom voice
                 const voiceSelect = document.getElementById('voice');
                 voiceSelect.value = 'custom';
-
-                showSuccess('Custom voice uploaded successfully!');
-
             } catch (error) {
                 console.error('Upload error:', error);
                 showError(`Failed to upload voice: ${error.message}`);
