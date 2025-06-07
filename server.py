@@ -70,7 +70,7 @@ async def tts(req: TTSRequest):
         global model, last_used
         if model is None:
             print("Loading model")
-            model = ChatterboxTTS.from_local("chatterbox", "cuda")
+            model = ChatterboxTTS.from_pretrained(device="cuda")
         last_used = datetime.now(timezone.utc)
 
         if req.voice not in voice_cache:
