@@ -56,7 +56,7 @@ unload_delay = timedelta(minutes=5)
 
 
 class TTSRequest(BaseModel):
-    model: Optional[str] = "tts-1"
+    model: Optional[str] = ""
     input: str
     voice: Optional[str] = "elise"
     exaggeration: Optional[float] = 0.3
@@ -114,11 +114,9 @@ async def upload_custom_voice(voice: UploadFile = File(...)):
     if not voice.content_type.startswith("audio/"):
         raise HTTPException(status_code=400, detail="File must be an audio file")
 
-    # Ensure voices directory exists
     voices_dir = Path("voices")
     voices_dir.mkdir(exist_ok=True)
 
-    # Save as custom.wav
     custom_voice_path = voices_dir / "custom.wav"
 
     try:
