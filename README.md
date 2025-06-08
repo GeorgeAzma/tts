@@ -13,11 +13,6 @@ OpenAI API compatible TTS model hosted on localhost:5000
 - run `python server.py`
 - go to `http://localhost:5000`
 
-### Adding voices
-- place your voice in `voices/` folder
-- rerun server.py and refresh the page
-- select your voice in the dropdown menu
-
 ### Using in Open WebUI
 - `Admin Panel > Settings > Audio`
 - `TTS engine: OpenAI`
