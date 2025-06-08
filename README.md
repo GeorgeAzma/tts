@@ -3,14 +3,13 @@ OpenAI API compatible TTS model hosted on localhost:5000
 ### Features 
 - Nice GUI
 - Custom Voices / Voice Cloning (from only seconds of audio)
+- Microphone recording
 - Lazy loading / Auto Unload (5m)
 
 ![webui](images/webui.png)
 
 ### How To Run
 - clone the repo
-- download all model files from https://huggingface.co/ResembleAI/chatterbox/
-- place them in `chatterbox/` folder (conds.pt, s3gen.pt, t3_cfg.pt, tokenizer.json, ve.pt)
 - run `python server.py`
 - go to `http://localhost:5000`
 
